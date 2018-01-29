@@ -1,38 +1,60 @@
-import * as {{ camelCase name }} from '{{position "actions"}}/{{ lowerCase name }}.actions';
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 
-export interface State {
+import { {{ properCase name }} } from '{{position "models"}}/{{ kebabCase name }}.model';
+import * as {{ camelCase name }} from '{{position "actions"}}/{{ kebabCase name }}.actions';
+
+// Keep these 2 (and delete the other 3) exports if you are NOT creating a list. Remove this comment.
+export interface {{ properCase name }}State {
+  loaded: boolean;
   loading: boolean;
-  entities: { [id: string]: any };
-  result: string[];
+  {{ camelCase name }}: {{ properCase name }} | null;
 }
 
-export const initialState: State = {
+export const initialState: {{ properCase name }}State = {
+  loaded: false,
   loading: false,
-  entities: {},
-  result: []
+  {{ camelCase name }}: null,
+};
+
+// Keep these 3 (and delete the other 2) exports if you are creating a list Remove this comment.
+export interface {{ properCase name }}State extends EntityState<{{ properCase name }}> {
+  loaded: boolean;
+  loading: boolean;
 }
 
-export function reducer(state = initialState, action: {{ camelCase name }}.Actions): State {
+export const adapter: EntityAdapter<{{ properCase name }}> = createEntityAdapter<{{ properCase name }}>({
+  selectId: {{ first name }} => {{ first name }}.id,
+  sortComparer: false,
+});
+
+export const initialState: {{ properCase name }}State = adapter.getInitialState({
+  loaded: false,
+  loading: false,
+});
+
+export function reducer(state = initialState, action: {{ camelCase name }}.{{ properCase name }}Actions): {{ properCase name }}State {
   switch (action.type) {
-    case {{ camelCase name }}.LOAD: {
+    case {{ camelCase name }}.LOAD_{{ constantCase name }}: {
       return {
         ...state,
         loading: true
       }
     }
 
-    case {{ camelCase name }}.LOAD_SUCCESS: {
-
+    case {{ camelCase name }}.LOAD_{{ constantCase name }}_SUCCESS: {
       return {
-        ...state,
+        ...state, // keep this and delete comment if you are NOT creating a list
+        {{ camelCase name }}: action.payload, // keep this and delete comment if you are NOT creating a list
+        ...adapter.addMany(action.payload, state), // keep this and delete comment if you are creating a list
+        loaded: true,
         loading: false,
       };
     }
 
-     case {{ camelCase name }}.LOAD_FAIL: {
-
+     case {{ camelCase name }}.LOAD_{{ constantCase name }}_FAIL: {
       return {
         ...state,
+        loaded: false,
         loading: false,
       };
     }
@@ -42,3 +64,7 @@ export function reducer(state = initialState, action: {{ camelCase name }}.Actio
     }
   }
 }
+
+export const get{{ properCase name }}Loaded = (state: {{ properCase name }}State) => state.loaded;
+export const get{{ properCase name }}Loading = (state: {{ properCase name }}State) => state.loading;
+export const get{{ properCase name }} = (state: {{ properCase name }}State) => state.{{ camelCase name }}; // keep this and delete comment if you are NOT creating a list

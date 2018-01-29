@@ -1,25 +1,29 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Actions, Effect } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
-import { {{properCase name }}Service } from '{{position "services"}}/{{ lowerCase name }}.service';
-import * as {{ camelCase name }} from '{{position "actions"}}/{{ lowerCase name }}.actions';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { Store } from '@ngrx/store';
+import { of } from 'rxjs/observable/of';
+import { switchMap, map, catchError } from 'rxjs/operators';
+
+import { {{ properCase name }} } from '{{position "models"}}/{{ kebabCase name }}.model';
+import { LOAD_{{ constantCase name }}, Load{{ properCase name }}Success, Load{{ properCase name }}Fail } from '{{position "actions"}}/{{ kebabCase name }}.actions';
 
 @Injectable()
 export class {{ properCase name }}Effects {
-  constructor(
-    private {{ camelCase name }}Service: {{ properCase name }}Service,
-    private actions$: Actions
-  ) { }
+  @Effect()
+  load{{ properCase name }}$ = this.actions$.ofType(LOAD_{{ constantCase name }}).pipe(
+    switchMap((action) => {
+      // ...
+      //return this.httpClient.get<{{ properCase name }}>(url, { headers });
+    }),
+    map({{ camelCase name }} => {
+      return new Load{{ properCase name }}Success({{ camelCase name }});
+    }),
+    catchError(err => {
+      return of(new Load{{ properCase name }}Fail(err));
+    })
+  );
 
-  @Effect() get$ = this.actions$
-      .ofType({{ camelCase name }}.LOAD)
-      .switchMap(payload => this.{{ camelCase name }}Service.get()
-        // If successful, dispatch success action with result
-        .map(res => ({ type: {{ camelCase name }}.LOAD_SUCCESS, payload: res.json() }))
-        // If request fails, dispatch failed action
-        .catch(() => Observable.of({ type: {{ camelCase name }}.LOAD_FAIL}))
-      );
+  /* istanbul ignore next because it's not worth testing the defaults here */
+  constructor(private store: Store<>, private actions$: Actions, private httpClient: HttpClient) { }
 }

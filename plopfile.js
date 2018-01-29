@@ -140,6 +140,10 @@ module.exports = function (plop) {
     return '.';
   });
 
+  plop.addHelper('first', function (string) {
+    return string[0];
+  });
+
   wholeGenerator(plop);
   actionGenerator(plop);
   reducerGenerator(plop);
